@@ -1,0 +1,328 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#14243a">
+<meta name="description" content="월급날 예산, 체크리스트, 비상금과 순자산을 기록하는 개인 자산관리 앱">
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="icon" href="./icon-192.png">
+<title>월급날 자산관리</title>
+<style>
+:root{--bg:#f3f6fb;--card:#fff;--ink:#182538;--muted:#69788d;--line:#e5ebf2;--navy:#14243a;--blue:#2864dc;--green:#16845b;--orange:#b7791f;--red:#b54747;--soft:#f7f9fc}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,BlinkMacSystemFont,"Noto Sans KR",sans-serif}
+header{background:linear-gradient(135deg,#14243a,#203c5e);color:white;padding:24px 18px 22px;border-radius:0 0 24px 24px}
+header .eyebrow{font-size:11px;letter-spacing:1.2px;opacity:.72;font-weight:700}h1{font-size:24px;letter-spacing:-.7px;margin:7px 0 4px}.subtitle{font-size:13px;opacity:.8}
+main{max-width:780px;margin:auto;padding:12px 13px 42px}
+nav{display:flex;gap:7px;overflow:auto;padding:12px 0 2px;position:sticky;top:0;background:var(--bg);z-index:4}
+nav a{white-space:nowrap;text-decoration:none;color:#41516a;background:#fff;border:1px solid var(--line);padding:8px 12px;border-radius:99px;font-size:12px;font-weight:700}
+.card{background:var(--card);border:1px solid var(--line);border-radius:17px;padding:16px;margin:11px 0;box-shadow:0 3px 12px #14243a08}
+h2{font-size:17px;margin:0 0 12px;letter-spacing:-.3px}h3{font-size:14px;margin:14px 0 8px}
+.muted{color:var(--muted);font-size:12px;line-height:1.5}.big{font-size:29px;font-weight:850;letter-spacing:-.8px}.green{color:var(--green)}.blue{color:var(--blue)}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:9px}.metric{background:var(--soft);border-radius:13px;padding:12px;min-width:0}.metric span{font-size:11px;color:var(--muted)}.metric b{display:block;font-size:19px;margin-top:5px;letter-spacing:-.4px;overflow-wrap:anywhere}
+.row{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--line)}.row:last-child{border-bottom:0}.row .name{font-size:13px;line-height:1.4;flex:1}.amount{font-size:13px;font-weight:750;white-space:nowrap}
+.bar{height:10px;background:#e9eef5;border-radius:99px;overflow:hidden;margin:9px 0}.bar>span{display:block;height:100%;width:0;background:var(--green);border-radius:99px;transition:width .2s}
+input,select,textarea{width:100%;border:1px solid #d9e1eb;border-radius:10px;padding:11px 12px;background:#fff;color:var(--ink);font:inherit;font-size:14px;min-width:0}
+input[type=checkbox]{width:20px;height:20px;accent-color:var(--green);padding:0;flex:0 0 20px}
+label.field{display:block;font-size:12px;color:var(--muted);font-weight:650;margin:9px 0 5px}
+button{border:0;border-radius:11px;background:var(--blue);color:white;padding:11px 14px;font-weight:750;font-size:13px;cursor:pointer}
+button.secondary{background:#edf2f8;color:#263951}button.outline{background:white;color:#33445c;border:1px solid var(--line)}button.danger{background:#fff0f0;color:#a33}
+.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.actions button{flex:1}
+.checkrow{display:flex;align-items:flex-start;gap:10px;padding:12px 0;border-bottom:1px solid var(--line)}.checkrow:last-child{border:0}.checkrow label{font-size:13px;line-height:1.45;flex:1}.checkrow small{display:block;color:var(--muted);font-size:11px;margin-top:3px}
+.tag{display:inline-block;padding:4px 8px;border-radius:99px;background:#eaf6f0;color:#14714e;font-size:11px;font-weight:750}
+.note{background:#fff8e9;border:1px solid #f2e2b9;border-radius:12px;padding:12px;font-size:12px;line-height:1.55;color:#72531c}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+table{width:100%;border-collapse:collapse;font-size:12px}td,th{text-align:left;padding:9px 5px;border-bottom:1px solid var(--line)}td:last-child,th:last-child{text-align:right;font-weight:700}th{color:var(--muted);font-weight:650}
+canvas{width:100%;height:190px;display:block}
+details{border-top:1px solid var(--line);padding:11px 0}summary{font-weight:700;font-size:13px;cursor:pointer}
+footer{text-align:center;color:var(--muted);font-size:11px;padding:18px 8px}
+@media(min-width:650px){main{padding-top:18px}.wide{display:grid;grid-template-columns:1fr 1fr;gap:10px}.wide>.card{margin:11px 0}}
+</style>
+</head>
+<body>
+<header>
+ <div class="eyebrow">PERSONAL FINANCE DASHBOARD</div>
+ <h1>월급날 자산관리</h1>
+ <div class="subtitle">예산 체크 · 비상금 목표 · 월별 순자산 기록</div>
+</header>
+<main>
+<nav>
+ <a href="#dashboard">요약</a><a href="#checklist">월급날 체크</a><a href="#assets">자산 기록</a><a href="#budget">월 예산</a><a href="#bonus">상여금</a><a href="#backup">백업</a>
+</nav>
+
+<section id="dashboard" class="card">
+ <div class="muted" id="monthTitle">이번 달 대시보드</div>
+ <div class="big">3,000,000원</div>
+ <div class="muted">월 실수령액 기준 · 성과급/정기상여금 제외</div>
+ <div class="grid" style="margin-top:13px">
+  <div class="metric"><span>월 저축·투자 목표</span><b>1,350,000원</b></div>
+  <div class="metric"><span>비상금 목표</span><b>5,000,000원</b></div>
+  <div class="metric"><span>이번 달 체크 진행률</span><b id="progressValue">0%</b></div>
+  <div class="metric"><span>현재 순자산</span><b id="netWorthTop">기록 전</b></div>
+ </div>
+ <div class="bar"><span id="progressBar"></span></div>
+ <div class="muted" id="progressCaption">월급날 체크리스트를 완료해 보세요.</div>
+</section>
+
+<div class="wide">
+<section class="card">
+ <h2>비상금 진행도</h2>
+ <div class="big" id="emergencyText">0원</div>
+ <div class="muted">목표 5,000,000원</div>
+ <div class="bar"><span id="emergencyBar"></span></div>
+ <label class="field" for="emergencyInput">현재 비상금 잔액</label>
+ <input id="emergencyInput" type="number" min="0" step="10000" placeholder="예: 1000000">
+ <div class="actions"><button id="saveEmergency">잔액 저장</button></div>
+ <div class="muted" id="emergencyCaption" style="margin-top:8px">현재 잔액을 입력하면 달성률을 계산해.</div>
+</section>
+<section class="card">
+ <h2>이번 달 저축·투자 배분</h2>
+ <div class="row"><span class="name">청년미래적금</span><span class="amount">500,000원</span></div>
+ <div class="row"><span class="name">주택청약</span><span class="amount">100,000원</span></div>
+ <div class="row"><span class="name">비상금 저축</span><span class="amount">400,000원</span></div>
+ <div class="row"><span class="name">ISA 투자</span><span class="amount">250,000원</span></div>
+ <div class="row"><span class="name">추가 목돈 저축</span><span class="amount">100,000원</span></div>
+ <div class="row"><span class="name">월말 예비비</span><span class="amount">47,752원</span></div>
+ <div class="muted">월급날 배분표 합계는 실제 대출 납입액·생활비에 따라 조정할 수 있어.</div>
+</section>
+</div>
+
+<section id="checklist" class="card">
+ <h2>월급날 체크리스트</h2>
+ <div class="flex muted">월 선택 후 해당 월의 실행 항목을 체크해. 지난달 기록도 보존돼.</div>
+ <label class="field" for="checkMonth">체크할 월</label>
+ <input type="month" id="checkMonth">
+ <div id="checkItems"></div>
+ <div class="actions">
+  <button class="secondary" id="clearChecks">이 달 체크 해제</button>
+  <button class="outline" id="completeChecks">전체 완료 표시</button>
+ </div>
+ <div class="muted" id="checkSummary" style="margin-top:9px"></div>
+</section>
+
+<section id="assets" class="card">
+ <h2>월별 자산 기록</h2>
+ <p class="muted">월급날마다 계좌 잔액을 입력하면 총자산과 순자산의 변화를 비교할 수 있어. 대출 잔액도 빼서 계산해.</p>
+ <label class="field" for="assetMonth">기록할 기준월</label>
+ <input type="month" id="assetMonth">
+ <div class="grid">
+  <div><label class="field" for="cashAsset">현금·예금·비상금 (원)</label><input id="cashAsset" type="number" min="0" placeholder="예: 5000000"></div>
+  <div><label class="field" for="isaAsset">ISA 평가금액 (원)</label><input id="isaAsset" type="number" min="0" placeholder="예: 2500000"></div>
+  <div><label class="field" for="youthAsset">청년미래적금 잔액 (원)</label><input id="youthAsset" type="number" min="0" placeholder="예: 3000000"></div>
+  <div><label class="field" for="housingAsset">주택청약 잔액 (원)</label><input id="housingAsset" type="number" min="0" placeholder="예: 1200000"></div>
+  <div><label class="field" for="otherAsset">기타 저축 잔액 (원)</label><input id="otherAsset" type="number" min="0" placeholder="예: 500000"></div>
+  <div><label class="field" for="debtAsset">남은 대출 원금 (원)</label><input id="debtAsset" type="number" min="0" placeholder="예: 14500000"></div>
+ </div>
+ <label class="field" for="assetNote">메모 (선택)</label><input id="assetNote" type="text" maxlength="120" placeholder="예: 상여금 입금, 이사비 지출 등">
+ <div class="grid" style="margin-top:12px">
+  <div class="metric"><span>총자산</span><b id="assetsTotal">0원</b></div>
+  <div class="metric"><span>순자산(총자산-대출)</span><b id="netWorth">0원</b></div>
+ </div>
+ <div class="actions"><button id="saveAsset">이 달 자산 기록 저장</button><button class="secondary" id="loadAsset">선택 월 기록 불러오기</button></div>
+ <div class="muted" id="assetStatus" style="margin-top:8px">각 계좌 앱에서 실제 잔액을 확인해 입력해.</div>
+ <h3>월별 순자산 변화</h3>
+ <canvas id="wealthChart" width="700" height="220" aria-label="월별 순자산 그래프"></canvas>
+ <div id="historyList"></div>
+</section>
+
+<section id="budget" class="card">
+ <h2>월 예산 기준표</h2>
+ <div class="muted">현재 합의한 예산안. 실제 지출과 다르면 기록을 보고 수정해.</div>
+ <h3>생활비·개인소비</h3>
+ <table><tbody>
+ <tr><td>월세</td><td>450,000원</td></tr>
+ <tr><td>신복위 대출 원리금(가정)</td><td>276,248원</td></tr>
+ <tr><td>공과금</td><td>50,000원</td></tr>
+ <tr><td>휴대폰 / 교통비</td><td>90,000원</td></tr>
+ <tr><td>동생 상환 / 구독료</td><td>100,000원</td></tr>
+ <tr><td>식비</td><td>336,000원</td></tr>
+ <tr><td>용돈(담배 포함)</td><td>300,000원</td></tr>
+ <tr><th>생활비 합계</th><th>1,602,248원</th></tr>
+ </tbody></table>
+ <h3>저축·투자</h3>
+ <table><tbody>
+ <tr><td>청년미래적금</td><td>500,000원</td></tr>
+ <tr><td>주택청약</td><td>100,000원</td></tr>
+ <tr><td>비상금 저축</td><td>400,000원</td></tr>
+ <tr><td>ISA 투자</td><td>250,000원</td></tr>
+ <tr><td>추가 목돈 저축</td><td>100,000원</td></tr>
+ <tr><td>월말 예비비</td><td>47,752원</td></tr>
+ <tr><th>총합</th><th>3,000,000원</th></tr>
+ </tbody></table>
+ <div class="note" style="margin-top:12px">식비 336,000원은 평일 저녁 월 20끼 + 주말 8끼, 끼니당 9,000원 기준 추정치야. 실제 외식 횟수에 따라 조정해. 대출 월 납입액은 1,500만 원·연 4%·60개월 원리금균등상환 가정값이므로 약정서의 실제 납입액을 우선해.</div>
+</section>
+
+<section id="bonus" class="card">
+ <h2>정기 상여금 기록</h2>
+ <div class="muted">상여금은 기본 월급 예산에 포함하지 않아. 실제 입금되면 수령 여부와 금액을 기록해.</div>
+ <div class="row"><span class="name">2월 예상 세후</span><b>1,500,000원</b></div>
+ <div class="row"><span class="name">5월 예상 세후</span><b>800,000원</b></div>
+ <div class="row"><span class="name">9월 예상 세후</span><b>1,500,000원</b></div>
+ <div class="row"><span class="name">연간 예상 합계</span><b>3,800,000원</b></div>
+ <label class="field" for="bonusMonth">실제 지급 월</label><input id="bonusMonth" type="month">
+ <label class="field" for="bonusAmount">실제 입금액 (원)</label><input id="bonusAmount" type="number" min="0" placeholder="실제 입금액">
+ <label class="field" for="bonusMemo">메모</label><input id="bonusMemo" type="text" maxlength="100" placeholder="예: 정기상여 / 추가 성과급">
+ <div class="actions"><button id="saveBonus">상여금 기록 저장</button></div>
+ <div id="bonusHistory" class="muted" style="margin-top:10px"></div>
+ <div class="note" style="margin-top:12px">심사에 따라 지급 여부가 달라지는 추가 성과급은 기본 예산에서 0원으로 계산하기로 했어. 실제 지급되면 별도 용돈으로 사용한다는 계획이야.</div>
+</section>
+
+<section id="backup" class="card">
+ <h2>데이터 백업·복원</h2>
+ <p class="muted">체크리스트, 월별 자산 기록, 비상금 잔액, 상여금 기록은 이 기기의 브라우저에 저장돼. 기기 변경이나 브라우저 초기화 전에 백업해.</p>
+ <div class="actions">
+  <button id="exportData">백업 파일 내려받기</button>
+  <button class="secondary" id="exportCsv">자산 기록 CSV</button>
+ </div>
+ <label class="field" for="importFile">백업 파일 복원(JSON)</label>
+ <input id="importFile" type="file" accept="application/json,.json">
+ <div class="actions"><button class="danger" id="eraseData">앱 데이터 전체 삭제</button></div>
+ <div class="muted" id="backupStatus" style="margin-top:8px"></div>
+</section>
+
+<footer>개인 기록용 앱 · 투자·대출 정보는 실제 금융기관 앱과 약정서를 기준으로 확인하세요.</footer>
+</main>
+<script>
+const KEY="paydayWealthTracker_v2";
+const today=new Date();
+const ym=d=>`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}`;
+const money=n=>Math.round(Number(n)||0).toLocaleString("ko-KR")+"원";
+const defaults={checks:{},assets:{},bonuses:[],emergency:0};
+let db=load();
+function load(){try{return {...defaults,...JSON.parse(localStorage.getItem(KEY)||"{}")}}catch(e){return structuredClone(defaults)}}
+function save(){localStorage.setItem(KEY,JSON.stringify(db))}
+const checklist=[
+ ["주거비","월세 납부 확인","450,000원"],
+ ["대출","신복위 대출 원리금 납부 확인","약 276,248원 · 약정서 금액 우선"],
+ ["공과금·통신","공과금·휴대폰·교통비 확인","월 예산 140,000원"],
+ ["식비","식비를 336,000원 안에서 관리","회사 식사 제공 반영"],
+ ["개인소비","용돈 300,000원 관리","담배값 포함"],
+ ["정책저축","청년미래적금 납입","500,000원"],
+ ["주택청약","주택청약 납입","100,000원"],
+ ["비상금","비상금 통장으로 이체","400,000원"],
+ ["투자","ISA에 입금하고 계획한 ETF 매수","250,000원"],
+ ["목돈","추가 목돈 저축","100,000원"],
+ ["월말 점검","실제 지출·계좌 잔액 확인","월말 예비비 47,752원은 남겨두기"]
+];
+const checkMonth=document.getElementById("checkMonth");
+const assetMonth=document.getElementById("assetMonth");
+checkMonth.value=ym(today);assetMonth.value=ym(today);
+function renderChecks(){
+ const m=checkMonth.value||ym(today), list=db.checks[m]||[];
+ const el=document.getElementById("checkItems");el.innerHTML="";
+ checklist.forEach((it,i)=>{
+  const d=document.createElement("div");d.className="checkrow";
+  const cb=document.createElement("input");cb.type="checkbox";cb.checked=!!list[i];
+  cb.addEventListener("change",()=>{db.checks[m]=db.checks[m]||[];db.checks[m][i]=cb.checked;save();renderChecks();});
+  const label=document.createElement("label");label.textContent=it[1];
+  const small=document.createElement("small");small.textContent=it[0]+" · "+it[2];label.appendChild(small);
+  d.append(cb,label);el.append(d);
+ });
+ const count=list.filter(Boolean).length,pct=Math.round(count/checklist.length*100);
+ document.getElementById("checkSummary").textContent=`${count}/${checklist.length}개 완료 · 진행률 ${pct}%`;
+ document.getElementById("progressValue").textContent=pct+"%";
+ document.getElementById("progressBar").style.width=pct+"%";
+ document.getElementById("progressCaption").textContent=count===checklist.length?"이번 달 체크리스트 완료!":`남은 항목 ${checklist.length-count}개`;
+ document.getElementById("monthTitle").textContent=m.replace("-","년 ")+"월 대시보드";
+}
+checkMonth.addEventListener("change",renderChecks);
+document.getElementById("clearChecks").onclick=()=>{if(confirm("선택한 월의 체크 상태를 모두 해제할까?")){db.checks[checkMonth.value]=[];save();renderChecks();}};
+document.getElementById("completeChecks").onclick=()=>{db.checks[checkMonth.value]=checklist.map(()=>true);save();renderChecks();};
+
+function updateEmergency(){
+ const v=Number(db.emergency)||0,p=Math.min(100,v/5000000*100);
+ document.getElementById("emergencyText").textContent=money(v);
+ document.getElementById("emergencyInput").value=v||"";
+ document.getElementById("emergencyBar").style.width=p+"%";
+ document.getElementById("emergencyCaption").textContent=`목표 달성률 ${p.toFixed(1)}% · 남은 금액 ${money(Math.max(0,5000000-v))}`;
+}
+document.getElementById("saveEmergency").onclick=()=>{db.emergency=Math.max(0,Number(document.getElementById("emergencyInput").value)||0);save();updateEmergency();};
+
+const assetFields=["cashAsset","isaAsset","youthAsset","housingAsset","otherAsset","debtAsset"];
+function readAssetForm(){
+ const v={};assetFields.forEach(k=>v[k]=Math.max(0,Number(document.getElementById(k).value)||0));
+ v.note=document.getElementById("assetNote").value.trim();
+ v.totalAssets=v.cashAsset+v.isaAsset+v.youthAsset+v.housingAsset+v.otherAsset;
+ v.netWorth=v.totalAssets-v.debtAsset;return v;
+}
+function updateAssetTotals(){
+ const v=readAssetForm();
+ document.getElementById("assetsTotal").textContent=money(v.totalAssets);
+ document.getElementById("netWorth").textContent=money(v.netWorth);
+}
+assetFields.forEach(k=>document.getElementById(k).addEventListener("input",updateAssetTotals));
+function clearAssetForm(){assetFields.forEach(k=>document.getElementById(k).value="");document.getElementById("assetNote").value="";updateAssetTotals();}
+function loadAssetForm(){
+ const m=assetMonth.value,a=db.assets[m];clearAssetForm();
+ if(a){assetFields.forEach(k=>document.getElementById(k).value=a[k]||0);document.getElementById("assetNote").value=a.note||"";document.getElementById("assetStatus").textContent=m+" 기록을 불러왔어."}
+ else document.getElementById("assetStatus").textContent=m+" 기록이 없어. 새로 입력하면 돼.";
+ updateAssetTotals();
+}
+document.getElementById("loadAsset").onclick=loadAssetForm;
+document.getElementById("saveAsset").onclick=()=>{
+ const m=assetMonth.value;if(!m){alert("기준월을 선택해.");return}
+ db.assets[m]=readAssetForm();save();renderAssets();
+ document.getElementById("assetStatus").textContent=m+" 자산 기록을 저장했어.";
+};
+assetMonth.addEventListener("change",loadAssetForm);
+function renderAssets(){
+ const arr=Object.entries(db.assets).sort((a,b)=>a[0].localeCompare(b[0]));
+ const latest=arr.at(-1)?.[1];
+ document.getElementById("netWorthTop").textContent=latest?money(latest.netWorth):"기록 전";
+ const list=document.getElementById("historyList");list.innerHTML="";
+ arr.slice().reverse().forEach(([m,a])=>{
+  const d=document.createElement("div");d.className="row";
+  const left=document.createElement("span");left.className="name";left.textContent=m+" · 총자산 "+money(a.totalAssets);
+  const right=document.createElement("b");right.className="amount";right.textContent="순자산 "+money(a.netWorth);
+  d.append(left,right);list.append(d);
+ });
+ drawChart(arr);
+}
+function drawChart(arr){
+ const c=document.getElementById("wealthChart"),ctx=c.getContext("2d"),w=c.width,h=c.height;
+ ctx.clearRect(0,0,w,h);
+ if(!arr.length){ctx.fillStyle="#758397";ctx.font="16px sans-serif";ctx.fillText("월별 자산 기록을 저장하면 그래프가 표시돼.",24,100);return}
+ const vals=arr.map(x=>x[1].netWorth),min=Math.min(0,...vals),max=Math.max(1,...vals),pad=42;
+ ctx.strokeStyle="#e5ebf2";ctx.lineWidth=1;
+ for(let i=0;i<4;i++){let y=pad+i*(h-2*pad)/3;ctx.beginPath();ctx.moveTo(pad,y);ctx.lineTo(w-12,y);ctx.stroke()}
+ const x=i=>pad+(arr.length===1?0:i*(w-pad-22)/(arr.length-1));
+ const y=v=>h-pad-(v-min)/(max-min||1)*(h-2*pad);
+ ctx.strokeStyle="#2864dc";ctx.lineWidth=4;ctx.lineJoin="round";ctx.beginPath();
+ arr.forEach((a,i)=>i?ctx.lineTo(x(i),y(a[1].netWorth)):ctx.moveTo(x(i),y(a[1].netWorth)));ctx.stroke();
+ arr.forEach((a,i)=>{ctx.fillStyle="#16845b";ctx.beginPath();ctx.arc(x(i),y(a[1].netWorth),5,0,Math.PI*2);ctx.fill();ctx.fillStyle="#69788d";ctx.font="11px sans-serif";ctx.textAlign="center";ctx.fillText(a[0].slice(2),x(i),h-12)});
+}
+function renderBonuses(){
+ const el=document.getElementById("bonusHistory");el.innerHTML="";
+ db.bonuses.sort((a,b)=>(a.month||"").localeCompare(b.month||"")).forEach((b,i)=>{
+  const d=document.createElement("div");d.className="row";
+  const l=document.createElement("span");l.className="name";l.textContent=b.month+" · "+(b.memo||"상여금");
+  const r=document.createElement("b");r.textContent=money(b.amount);
+  d.append(l,r);el.append(d);
+ });
+}
+document.getElementById("saveBonus").onclick=()=>{
+ const month=document.getElementById("bonusMonth").value,amount=Number(document.getElementById("bonusAmount").value)||0;
+ if(!month||amount<=0){alert("지급 월과 실제 입금액을 입력해.");return}
+ db.bonuses.push({month,amount,memo:document.getElementById("bonusMemo").value.trim()});save();renderBonuses();
+ document.getElementById("bonusAmount").value="";document.getElementById("bonusMemo").value="";
+};
+function download(name,content,type){const blob=new Blob([content],{type}),url=URL.createObjectURL(blob),a=document.createElement("a");a.href=url;a.download=name;a.click();URL.revokeObjectURL(url)}
+document.getElementById("exportData").onclick=()=>download("월급날자산관리_백업_"+ym(today)+".json",JSON.stringify(db,null,2),"application/json");
+document.getElementById("exportCsv").onclick=()=>{
+ const rows=[["월","현금·예금","ISA","청년미래적금","주택청약","기타저축","대출잔액","총자산","순자산","메모"]];
+ Object.entries(db.assets).sort().forEach(([m,a])=>rows.push([m,a.cashAsset,a.isaAsset,a.youthAsset,a.housingAsset,a.otherAsset,a.debtAsset,a.totalAssets,a.netWorth,a.note||""]));
+ const csv="\uFEFF"+rows.map(r=>r.map(v=>'"'+String(v??"").replaceAll('"','""')+'"').join(",")).join("\n");
+ download("월별자산기록_"+ym(today)+".csv",csv,"text/csv;charset=utf-8");
+};
+document.getElementById("importFile").addEventListener("change",async e=>{
+ const f=e.target.files[0];if(!f)return;
+ try{const parsed=JSON.parse(await f.text());if(!confirm("현재 앱 기록을 백업 파일 내용으로 교체할까? 먼저 현재 데이터도 백업하는 걸 권장해."))return;
+ db={...defaults,...parsed};save();renderChecks();updateEmergency();renderAssets();renderBonuses();alert("백업 데이터를 복원했어.");}
+ catch(err){alert("백업 파일을 읽지 못했어. 올바른 JSON 백업 파일인지 확인해.");}
+ e.target.value="";
+});
+document.getElementById("eraseData").onclick=()=>{if(confirm("모든 체크리스트와 자산 기록을 영구 삭제할까? 먼저 백업했는지 확인해.")){localStorage.removeItem(KEY);db=load();renderChecks();updateEmergency();renderAssets();renderBonuses();clearAssetForm();}};
+renderChecks();updateEmergency();renderAssets();renderBonuses();loadAssetForm();
+if("serviceWorker" in navigator && location.protocol==="https:"){navigator.serviceWorker.register("./sw.js").catch(()=>{});}
+</script>
+</body></html>
